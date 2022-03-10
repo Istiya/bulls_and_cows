@@ -3,6 +3,7 @@ import 'dart:core';
 
 import 'package:flutter/material.dart';
 import 'package:bulls_and_cows/custom_vidgets/number_list.dart';
+import 'package:bulls_and_cows/custom_vidgets/entered_number_button.dart';
 
 class SinglePlayerGameScreen extends StatefulWidget {
   const SinglePlayerGameScreen({Key? key}) : super(key: key);
@@ -142,30 +143,6 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
                     NumberList.buttonActiveList[int.parse(digit) - 1] = false;
                   }
                 : null));
-  }
-
-  Widget enteredNumberButton(int index, int secondIndex) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxHeight: 70, maxWidth: 30),
-      child: TextButton(
-        onPressed: () {},
-        child: Text(
-          NumberList.numberList[index][secondIndex],
-          style: const TextStyle(
-              fontFamily: 'AmaticSc',
-              color: Color(0xFF6D4951),
-              fontSize: 45,
-              fontWeight: FontWeight.bold),
-          // style: const TextStyle(backgroundColor: Color(0xFFF0C5CE)),
-        ),
-        style: TextButton.styleFrom(
-          padding: EdgeInsets.zero,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          backgroundColor: const Color(0xFFFEE6E5),
-        ),
-      ),
-    );
   }
 
   // Можно оптимизировать
