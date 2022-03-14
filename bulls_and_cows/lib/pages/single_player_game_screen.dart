@@ -3,6 +3,7 @@ import 'dart:core';
 
 import 'package:flutter/material.dart';
 import 'package:bulls_and_cows/custom_vidgets/number_list.dart';
+import 'package:bulls_and_cows/custom_vidgets/digit_button.dart';
 import 'package:bulls_and_cows/custom_vidgets/entered_number_button.dart';
 
 class SinglePlayerGameScreen extends StatefulWidget {
@@ -95,15 +96,15 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const SizedBox(width: 5),
-            digitButton('1'),
-            digitButton('2'),
-            digitButton('3'),
-            digitButton('4'),
-            digitButton('5'),
-            digitButton('6'),
-            digitButton('7'),
-            digitButton('8'),
-            digitButton('9'),
+            DigitButton('1'),
+            DigitButton('2'),
+            DigitButton('3'),
+            DigitButton('4'),
+            DigitButton('5'),
+            DigitButton('6'),
+            DigitButton('7'),
+            DigitButton('8'),
+            DigitButton('9'),
             const SizedBox(width: 5),
           ],
         ),
@@ -111,84 +112,6 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
       ],
     ));
   }
-
-  Widget digitButton(String digit) {
-    return ConstrainedBox(
-        constraints: const BoxConstraints(maxHeight: 70, maxWidth: 30),
-        child: TextButton(
-            child: Text(
-              digit,
-              style: const TextStyle(
-                  fontFamily: 'AmaticSc',
-                  color: Color(0xFF6D4951),
-                  fontSize: 45,
-                  fontWeight: FontWeight.bold),
-            ),
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.zero,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              backgroundColor: NumberList.buttonActiveList[int.parse(digit) - 1]
-                  ? const Color(0xFFFEE6E5)
-                  : const Color(0xFFAD8089),
-            ),
-            onPressed: NumberList.buttonActiveList[int.parse(digit) - 1]
-                ? () {
-                    for (int i = 0; i < 4; i++) {
-                      if (NumberList.draftNumber[i].isEmpty) {
-                        setState(() {
-                          NumberList.draftNumber[i] = digit;
-                        });
-                        break;
-                      }
-                    }
-                    NumberList.buttonActiveList[int.parse(digit) - 1] = false;
-                  }
-                : null));
-  }
-
-  // Widget enteredNumberButton(String number) {
-  //   int curColor = 0;
-  //   return ConstrainedBox(
-  //     constraints: const BoxConstraints(maxHeight: 70, maxWidth: 30),
-  //     child: TextButton(
-  //       onPressed: () => {
-  //         curColor == buttonColors.nothing.index
-  //             ? setState(() {
-  //                 print("on pressed nothing");
-  //                 curColor = buttonColors.cow.index;
-  //               })
-  //             : curColor == buttonColors.cow.index
-  //                 ? setState(() {
-  //                     print("on pressed cow");
-  //                     curColor = buttonColors.bull.index;
-  //                   })
-  //                 : setState(() {
-  //                     print("on pressed bull");
-  //                     curColor = buttonColors.nothing.index;
-  //                   })
-  //       },
-  //       child: Text(
-  //         number,
-  //         style: const TextStyle(
-  //             fontFamily: 'AmaticSc',
-  //             color: Color(0xFF6D4951),
-  //             fontSize: 45,
-  //             fontWeight: FontWeight.bold),
-  //       ),
-  //       style: TextButton.styleFrom(
-  //         padding: EdgeInsets.zero,
-  //         shape:
-  //             RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-  //         backgroundColor: curColor == buttonColors.nothing.index
-  //             ? const Color(0xFFFEE6E5)
-  //             : curColor == buttonColors.bull.index
-  //                 ? const Color(0xFFFF9B9B)
-  //                 : const Color(0xFFFFDAB8),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   // Можно оптимизировать
   String checkResult() {

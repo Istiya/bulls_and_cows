@@ -3,20 +3,15 @@ import 'package:flutter/material.dart';
 enum buttonColors { nothing, cow, bull }
 
 class EnteredNumberButton extends StatefulWidget {
-  String number;
+  final String number;
 
-  EnteredNumberButton(this.number, {Key? key}) : super(key: key);
+  const EnteredNumberButton(this.number, {Key? key}) : super(key: key);
 
   @override
-  State<EnteredNumberButton> createState() =>
-      _EnteredNumberButtonState(this.number);
+  State<EnteredNumberButton> createState() => _EnteredNumberButtonState();
 }
 
 class _EnteredNumberButtonState extends State<EnteredNumberButton> {
-  String number;
-
-  _EnteredNumberButtonState(this.number);
-
   List<Color> colorList = [
     const Color(0xFFFEE6E5),
     const Color(0xFFFF9B9B),
@@ -33,21 +28,18 @@ class _EnteredNumberButtonState extends State<EnteredNumberButton> {
         onPressed: () => {
           curColor == buttonColors.nothing.index
               ? setState(() {
-                  print("on pressed nothing");
                   curColor = buttonColors.cow.index;
                 })
               : curColor == buttonColors.cow.index
                   ? setState(() {
-                      print("on pressed cow");
                       curColor = buttonColors.bull.index;
                     })
                   : setState(() {
-                      print("on pressed bull");
                       curColor = buttonColors.nothing.index;
                     })
         },
         child: Text(
-          number,
+          widget.number,
           style: const TextStyle(
               fontFamily: 'AmaticSc',
               color: Color(0xFF6D4951),
