@@ -4,6 +4,7 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:bulls_and_cows/custom_vidgets/number_list.dart';
 import 'package:bulls_and_cows/custom_vidgets/digit_button.dart';
+import 'package:bulls_and_cows/custom_vidgets/draft_number_button.dart';
 import 'package:bulls_and_cows/custom_vidgets/entered_number_button.dart';
 
 class SinglePlayerGameScreen extends StatefulWidget {
@@ -47,7 +48,6 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
         const SizedBox(height: 50),
         Expanded(
             child: ListView.builder(
-          // padding: const EdgeInsets.all(50.0),
           itemCount: NumberList.numberList.length,
           itemBuilder: (BuildContext context, int index) {
             return Row(
@@ -67,11 +67,14 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
                   EnteredNumberButton(NumberList.numberList[index][i]),
                 Text(NumberList.numberList[index][4]),
                 const SizedBox(width: 50),
+                const Padding(padding: EdgeInsets.only(bottom: 65))
               ],
             );
           },
         )),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisSize: MainAxisSize.max,
           children: [
             const SizedBox(width: 50),
             IconButton(
@@ -82,7 +85,7 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
                   });
                 },
                 icon: const Icon(Icons.delete)),
-            Expanded(child: Text(NumberList.draftNumber.join(' '))),
+            for (int i = 0; i < 4; i++) DraftNumberButton(i),
             IconButton(
                 onPressed: () {
                   if (!NumberList.draftNumber.contains('')) {
@@ -107,7 +110,7 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
             const SizedBox(width: 5),
           ],
         ),
-        const SizedBox(height: 100),
+        const SizedBox(height: 50),
       ],
     ));
   }

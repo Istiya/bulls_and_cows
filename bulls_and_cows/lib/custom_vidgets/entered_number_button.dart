@@ -1,8 +1,10 @@
+import 'package:bulls_and_cows/custom_vidgets/custom_button.dart';
 import 'package:flutter/material.dart';
 
-class EnteredNumberButton extends StatefulWidget {
+class EnteredNumberButton extends CustomButton {
   final String number;
-
+  @override
+  TextStyle get enteredButtonTextStyle => customButtonTextStyle;
   const EnteredNumberButton(this.number, {Key? key}) : super(key: key);
 
   @override
@@ -24,15 +26,9 @@ class _EnteredNumberButtonState extends State<EnteredNumberButton> {
     return ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 70, maxWidth: 30),
       child: TextButton(
-        onPressed: () => setState(() => curColor = (curColor + 1) % 4),
-        child: Text(
-          widget.number,
-          style: const TextStyle(
-              fontFamily: 'AmaticSc',
-              color: Color(0xFF6D4951),
-              fontSize: 45,
-              fontWeight: FontWeight.bold),
-        ),
+        onPressed: () =>
+            setState(() => curColor = (curColor + 1) % colorList.length),
+        child: Text(widget.number, style: widget.customButtonTextStyle),
         style: TextButton.styleFrom(
           padding: EdgeInsets.zero,
           shape:
