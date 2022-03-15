@@ -18,6 +18,13 @@ enum buttonColors { nothing, cow, bull }
 class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
   Set<String> hiddenNumber = {};
 
+  void changeDraftNumber(int i, String digit) {
+    setState(() {
+      NumberList.draftNumber[i] = digit;
+      NumberList.buttonActiveList[int.parse(digit) - 1] = false;
+    });
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -40,6 +47,7 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
         const SizedBox(height: 50),
         Expanded(
             child: ListView.builder(
+          // padding: const EdgeInsets.all(50.0),
           itemCount: NumberList.numberList.length,
           itemBuilder: (BuildContext context, int index) {
             return Row(
@@ -55,10 +63,8 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
                       fontSize: 45,
                       fontWeight: FontWeight.bold),
                 ),
-                EnteredNumberButton(NumberList.numberList[index][0]),
-                EnteredNumberButton(NumberList.numberList[index][1]),
-                EnteredNumberButton(NumberList.numberList[index][2]),
-                EnteredNumberButton(NumberList.numberList[index][3]),
+                for (int i = 0; i < 4; i++)
+                  EnteredNumberButton(NumberList.numberList[index][i]),
                 Text(NumberList.numberList[index][4]),
                 const SizedBox(width: 50),
               ],
@@ -72,8 +78,8 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
                 onPressed: () {
                   setState(() {
                     NumberList.delete();
+                    NumberList.buttonActiveList = List.filled(9, true);
                   });
-                  NumberList.buttonActiveList = List.filled(9, true);
                 },
                 icon: const Icon(Icons.delete)),
             Expanded(child: Text(NumberList.draftNumber.join(' '))),
@@ -84,8 +90,8 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
                       NumberList.numberList.add(NumberList.draftNumber);
                       NumberList.numberList.last.add(checkResult());
                       NumberList.delete();
+                      NumberList.buttonActiveList = List.filled(9, true);
                     });
-                    NumberList.buttonActiveList = List.filled(9, true);
                   }
                 },
                 icon: const Icon(Icons.check)),
@@ -96,15 +102,8 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const SizedBox(width: 5),
-            DigitButton('1'),
-            DigitButton('2'),
-            DigitButton('3'),
-            DigitButton('4'),
-            DigitButton('5'),
-            DigitButton('6'),
-            DigitButton('7'),
-            DigitButton('8'),
-            DigitButton('9'),
+            for (int i = 1; i < 10; i++)
+              DigitButton(i.toString(), changeDraftNumber),
             const SizedBox(width: 5),
           ],
         ),

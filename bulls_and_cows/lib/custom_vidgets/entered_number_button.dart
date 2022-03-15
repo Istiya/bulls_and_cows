@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-enum buttonColors { nothing, cow, bull }
-
 class EnteredNumberButton extends StatefulWidget {
   final String number;
 
@@ -15,7 +13,8 @@ class _EnteredNumberButtonState extends State<EnteredNumberButton> {
   List<Color> colorList = [
     const Color(0xFFFEE6E5),
     const Color(0xFFFF9B9B),
-    const Color(0xFFFFDAB8)
+    const Color(0xFFFFDAB8),
+    Colors.grey
   ];
 
   int curColor = 0;
@@ -25,19 +24,7 @@ class _EnteredNumberButtonState extends State<EnteredNumberButton> {
     return ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 70, maxWidth: 30),
       child: TextButton(
-        onPressed: () => {
-          curColor == buttonColors.nothing.index
-              ? setState(() {
-                  curColor = buttonColors.cow.index;
-                })
-              : curColor == buttonColors.cow.index
-                  ? setState(() {
-                      curColor = buttonColors.bull.index;
-                    })
-                  : setState(() {
-                      curColor = buttonColors.nothing.index;
-                    })
-        },
+        onPressed: () => setState(() => curColor = (curColor + 1) % 4),
         child: Text(
           widget.number,
           style: const TextStyle(
@@ -50,11 +37,7 @@ class _EnteredNumberButtonState extends State<EnteredNumberButton> {
           padding: EdgeInsets.zero,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          backgroundColor: curColor == buttonColors.nothing.index
-              ? const Color(0xFFFEE6E5)
-              : curColor == buttonColors.bull.index
-                  ? const Color(0xFFFF9B9B)
-                  : const Color(0xFFFFDAB8),
+          backgroundColor: colorList[curColor],
         ),
       ),
     );

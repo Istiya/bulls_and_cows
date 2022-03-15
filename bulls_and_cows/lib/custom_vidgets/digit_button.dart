@@ -3,8 +3,9 @@ import 'package:bulls_and_cows/custom_vidgets/number_list.dart';
 
 class DigitButton extends StatefulWidget {
   final String digit;
+  final Function valueChanged;
   // ignore: prefer_const_constructors_in_immutables
-  DigitButton(this.digit, {Key? key}) : super(key: key);
+  DigitButton(this.digit, this.valueChanged, {Key? key}) : super(key: key);
 
   @override
   State<DigitButton> createState() => _DigitButton();
@@ -37,14 +38,13 @@ class _DigitButton extends State<DigitButton> {
                 ? () {
                     for (int i = 0; i < 4; i++) {
                       if (NumberList.draftNumber[i].isEmpty) {
-                        NumberList.draftNumber[i] = widget.digit;
-                        break;
+                        widget.valueChanged(i, widget.digit);
+                        if (i == 3) {
+                          return;
+                        }
+                        return;
                       }
                     }
-                    setState(() {
-                      NumberList.buttonActiveList[int.parse(widget.digit) - 1] =
-                          false;
-                    });
                   }
                 : null));
   }
