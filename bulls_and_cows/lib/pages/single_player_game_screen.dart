@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:core';
 
 import 'package:flutter/material.dart';
@@ -17,12 +16,19 @@ class SinglePlayerGameScreen extends StatefulWidget {
 enum buttonColors { nothing, cow, bull }
 
 class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
-  Set<String> hiddenNumber = {};
-
   void changeDraftNumber(int i, String digit) {
     setState(() {
-      NumberList.draftNumber[i] = digit;
+      if (NumberList.draftNumberList[i].isNotEmpty) {
+        NumberList.lastDraftNumber = NumberList.draftNumberList[i];
+      }
+      NumberList.draftNumberList[i] = digit;
       NumberList.buttonActiveList[int.parse(digit) - 1] = false;
+    });
+  }
+
+  void changeDigitButton(int i) {
+    setState(() {
+      NumberList.buttonDraftNumber = i;
     });
   }
 
@@ -34,85 +40,100 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
   @override
   void initState() {
     super.initState();
-    do {
-      hiddenNumber.add((Random().nextInt(9) + 1).toString());
-    } while (hiddenNumber.length != 4);
-    print(hiddenNumber.toString());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              Navigator.of(context).pop();
+              NumberList.closePage();
+            },
+          ),
+          title: const Text('Bulls and cows'),
+          actions: [
+            IconButton(
+                onPressed: () => setState(() {
+                      NumberList.restartGame();
+                    }),
+                icon: const Icon(Icons.refresh))
+          ],
+        ),
         body: Column(
-      children: [
-        const SizedBox(height: 50),
-        Expanded(
-            child: ListView.builder(
-          itemCount: NumberList.numberList.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Row(
+          children: [
+            Expanded(
+                child: ListView.builder(
+              itemCount: NumberList.numberList.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(width: 50),
+                    Text(
+                      (index + 1).toString() + '.',
+                      style: const TextStyle(
+                          fontFamily: 'AmaticSc',
+                          color: Color(0xFF6D4951),
+                          fontSize: 45,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    for (int i = 0; i < 4; i++)
+                      EnteredNumberButton(NumberList.numberList[index][i]),
+                    Text(NumberList.numberList[index][4]),
+                    const SizedBox(width: 50),
+                    const Padding(padding: EdgeInsets.only(bottom: 65))
+                  ],
+                );
+              },
+            )),
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: MainAxisSize.max,
               children: [
                 const SizedBox(width: 50),
-                Text(
-                  (index + 1).toString() + '.',
-                  style: const TextStyle(
-                      fontFamily: 'AmaticSc',
-                      color: Color(0xFF6D4951),
-                      fontSize: 45,
-                      fontWeight: FontWeight.bold),
-                ),
+                IconButton(
+                    onPressed: () {
+                      setState(() {
+                        NumberList.clearDraftNumberList();
+                        NumberList.generateButtonActiveList();
+                        NumberList.buttonDraftNumber = 0;
+                      });
+                    },
+                    icon: const Icon(Icons.delete)),
                 for (int i = 0; i < 4; i++)
-                  EnteredNumberButton(NumberList.numberList[index][i]),
-                Text(NumberList.numberList[index][4]),
+                  DraftNumberButton(i, changeDigitButton),
+                IconButton(
+                    onPressed: () {
+                      if (!NumberList.draftNumberList.contains('')) {
+                        setState(() {
+                          NumberList.numberList.add(NumberList.draftNumberList);
+                          NumberList.numberList.last.add(checkResult());
+                          NumberList.clearDraftNumberList();
+                          NumberList.generateButtonActiveList();
+                          NumberList.buttonDraftNumber = 0;
+                        });
+                      }
+                    },
+                    icon: const Icon(Icons.check)),
                 const SizedBox(width: 50),
-                const Padding(padding: EdgeInsets.only(bottom: 65))
               ],
-            );
-          },
-        )),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            const SizedBox(width: 50),
-            IconButton(
-                onPressed: () {
-                  setState(() {
-                    NumberList.delete();
-                    NumberList.buttonActiveList = List.filled(9, true);
-                  });
-                },
-                icon: const Icon(Icons.delete)),
-            for (int i = 0; i < 4; i++) DraftNumberButton(i),
-            IconButton(
-                onPressed: () {
-                  if (!NumberList.draftNumber.contains('')) {
-                    setState(() {
-                      NumberList.numberList.add(NumberList.draftNumber);
-                      NumberList.numberList.last.add(checkResult());
-                      NumberList.delete();
-                      NumberList.buttonActiveList = List.filled(9, true);
-                    });
-                  }
-                },
-                icon: const Icon(Icons.check)),
-            const SizedBox(width: 50),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const SizedBox(width: 5),
+                for (int i = 1; i < 10; i++)
+                  DigitButton(i.toString(), changeDraftNumber),
+                const SizedBox(width: 5),
+              ],
+            ),
+            const SizedBox(height: 50),
           ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const SizedBox(width: 5),
-            for (int i = 1; i < 10; i++)
-              DigitButton(i.toString(), changeDraftNumber),
-            const SizedBox(width: 5),
-          ],
-        ),
-        const SizedBox(height: 50),
-      ],
-    ));
+        ));
   }
 
   // Можно оптимизировать
@@ -122,7 +143,8 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
 
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
-        if (NumberList.draftNumber[i] == hiddenNumber.elementAt(j)) {
+        if (NumberList.draftNumberList[i] ==
+            NumberList.hiddenNumber.elementAt(j)) {
           i == j ? bulls++ : cows++;
           break;
         }

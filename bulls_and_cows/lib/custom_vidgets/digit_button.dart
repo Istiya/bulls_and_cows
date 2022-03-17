@@ -32,28 +32,28 @@ class _DigitButton extends State<DigitButton> {
                       ? const Color(0xFFFEE6E5)
                       : const Color(0xFFAD8089),
             ),
-            onPressed: NumberList.buttonActiveList[int.parse(widget.digit) - 1]
+            onPressed: NumberList
+                        .buttonActiveList[int.parse(widget.digit) - 1] &&
+                    NumberList.buttonDraftNumber != null
                 ? () {
+                    widget.valueChanged(
+                        NumberList.buttonDraftNumber, widget.digit);
+
+                    if (NumberList.lastDraftNumber != null) {
+                      NumberList.buttonActiveList[
+                          int.parse(NumberList.lastDraftNumber!) - 1] = true;
+                      NumberList.lastDraftNumber = null;
+                    }
+
                     for (int i = 0; i < 4; i++) {
-                      if (NumberList.buttonDraftNumber[i]) {
-                        if (NumberList.draftNumber[i].isNotEmpty) {
-                          int b = int.parse(NumberList.draftNumber[i]);
-                          NumberList.buttonActiveList[b - 1] = true;
-                        }
-                        widget.valueChanged(i, widget.digit);
-                        NumberList.buttonDraftNumber[i] = false;
+                      if (NumberList.draftNumberList[i].isEmpty) {
+                        NumberList.buttonDraftNumber = i;
                         return;
                       }
                     }
-                    for (int i = 0; i < 4; i++) {
-                      if (NumberList.draftNumber[i].isEmpty) {
-                        widget.valueChanged(i, widget.digit);
-                        if (i == 3) {
-                          return;
-                        }
-                        return;
-                      }
-                    }
+
+                    NumberList.buttonDraftNumber = null;
+                    return;
                   }
                 : null));
   }
