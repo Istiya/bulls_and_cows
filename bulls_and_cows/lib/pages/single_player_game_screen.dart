@@ -1,7 +1,7 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
-import 'package:bulls_and_cows/custom_vidgets/number_list.dart';
+import 'package:bulls_and_cows/custom_vidgets/game_manager.dart';
 import 'package:bulls_and_cows/custom_vidgets/digit_button.dart';
 import 'package:bulls_and_cows/custom_vidgets/draft_number_button.dart';
 import 'package:bulls_and_cows/custom_vidgets/entered_number_button.dart';
@@ -18,17 +18,40 @@ enum buttonColors { nothing, cow, bull }
 class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
   void changeDraftNumber(int i, String digit) {
     setState(() {
-      if (NumberList.draftNumberList[i].isNotEmpty) {
-        NumberList.lastDraftNumber = NumberList.draftNumberList[i];
+      if (GameManager.draftNumberList[i].isNotEmpty) {
+        if (GameManager.onLongPressedSelectedDraftNumberButtonsList[i]) {
+          GameManager.lastOnLongPressedSelectedDraftNumbersList[i] = digit;
+        }
+        GameManager.lastOnPressedSelectedDraftNumber =
+            GameManager.draftNumberList[i];
       }
-      NumberList.draftNumberList[i] = digit;
-      NumberList.buttonActiveList[int.parse(digit) - 1] = false;
+      GameManager.draftNumberList[i] = digit;
+      GameManager.buttonActiveList[int.parse(digit) - 1] = false;
     });
   }
 
-  void changeDigitButton(int i) {
+  void changeSelectedDraftNumberButton(int i) {
     setState(() {
-      NumberList.buttonDraftNumber = i;
+      GameManager.onPressedSelectedDraftNumberButton = i;
+    });
+  }
+
+  void changeOnLongPressedSelectedDraftNumber(int digit) {
+    setState(() {
+      if (GameManager.onLongPressedSelectedDraftNumberButtonsList[digit]) {
+        GameManager.onLongPressedSelectedDraftNumberButtonsList[digit] = false;
+        GameManager.lastOnLongPressedSelectedDraftNumbersList[digit] = null;
+      } else {
+        GameManager.onLongPressedSelectedDraftNumberButtonsList[digit] = true;
+        GameManager.lastOnLongPressedSelectedDraftNumbersList[digit] =
+            GameManager.draftNumberList[digit];
+      }
+    });
+  }
+
+  void changeOnLongPressedSelectedEnteredNumber(String? digit) {
+    setState(() {
+      GameManager.onLongPressedSelectedEnteredNumber = digit;
     });
   }
 
@@ -50,14 +73,14 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
               Navigator.of(context).pop();
-              NumberList.closePage();
+              GameManager.clearAllInstance();
             },
           ),
           title: const Text('Bulls and cows'),
           actions: [
             IconButton(
                 onPressed: () => setState(() {
-                      NumberList.restartGame();
+                      GameManager.generateStartInstance();
                     }),
                 icon: const Icon(Icons.refresh))
           ],
@@ -66,7 +89,7 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
           children: [
             Expanded(
                 child: ListView.builder(
-              itemCount: NumberList.numberList.length,
+              itemCount: GameManager.enteredNumberList.length,
               itemBuilder: (BuildContext context, int index) {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -82,8 +105,10 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
                           fontWeight: FontWeight.bold),
                     ),
                     for (int i = 0; i < 4; i++)
-                      EnteredNumberButton(NumberList.numberList[index][i]),
-                    Text(NumberList.numberList[index][4]),
+                      EnteredNumberButton(
+                          GameManager.enteredNumberList[index][i],
+                          changeOnLongPressedSelectedEnteredNumber),
+                    Text(GameManager.enteredNumberList[index][4]),
                     const SizedBox(width: 50),
                     const Padding(padding: EdgeInsets.only(bottom: 65))
                   ],
@@ -98,23 +123,33 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
                 IconButton(
                     onPressed: () {
                       setState(() {
-                        NumberList.clearDraftNumberList();
-                        NumberList.generateButtonActiveList();
-                        NumberList.buttonDraftNumber = 0;
+                        GameManager.generateClearDraftNumberList();
+                        GameManager.generateClearButtonActiveList();
+                        GameManager.onPressedSelectedDraftNumberButton = 0;
                       });
                     },
                     icon: const Icon(Icons.delete)),
                 for (int i = 0; i < 4; i++)
-                  DraftNumberButton(i, changeDigitButton),
+                  DraftNumberButton(i, changeSelectedDraftNumberButton,
+                      changeOnLongPressedSelectedDraftNumber),
                 IconButton(
                     onPressed: () {
-                      if (!NumberList.draftNumberList.contains('')) {
+                      if (!GameManager.draftNumberList.contains('')) {
                         setState(() {
-                          NumberList.numberList.add(NumberList.draftNumberList);
-                          NumberList.numberList.last.add(checkResult());
-                          NumberList.clearDraftNumberList();
-                          NumberList.generateButtonActiveList();
-                          NumberList.buttonDraftNumber = 0;
+                          GameManager.enteredNumberList
+                              .add(GameManager.draftNumberList);
+                          GameManager.enteredNumberList.last.add(checkResult());
+                          GameManager.generateClearDraftNumberList();
+                          GameManager.generateClearButtonActiveList();
+                          for (int i = 0; i < 4; i++) {
+                            if (!GameManager
+                                    .onLongPressedSelectedDraftNumberButtonsList[
+                                i]) {
+                              GameManager.onPressedSelectedDraftNumberButton =
+                                  i;
+                              return;
+                            }
+                          }
                         });
                       }
                     },
@@ -143,8 +178,8 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
 
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
-        if (NumberList.draftNumberList[i] ==
-            NumberList.hiddenNumber.elementAt(j)) {
+        if (GameManager.draftNumberList[i] ==
+            GameManager.hiddenNumberSet.elementAt(j)) {
           i == j ? bulls++ : cows++;
           break;
         }

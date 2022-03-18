@@ -1,4 +1,4 @@
-import 'package:bulls_and_cows/custom_vidgets/number_list.dart';
+import 'package:bulls_and_cows/custom_vidgets/game_manager.dart';
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatelessWidget {
@@ -20,7 +20,7 @@ class MainScreen extends StatelessWidget {
             style: ElevatedButton.styleFrom(primary: Colors.greenAccent),
             child: const Text('Play'),
             onPressed: () {
-              NumberList.restartGame();
+              GameManager.generateStartInstance();
               Navigator.pushNamed(context, 'singleplayer_game_screen');
             },
           ),
