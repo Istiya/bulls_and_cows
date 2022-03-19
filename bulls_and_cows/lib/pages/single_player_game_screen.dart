@@ -13,8 +13,6 @@ class SinglePlayerGameScreen extends StatefulWidget {
   _SinglePlayerGameScreenState createState() => _SinglePlayerGameScreenState();
 }
 
-enum buttonColors { nothing, cow, bull }
-
 class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
   void changeDraftNumber(int i, String digit) {
     setState(() {
@@ -89,6 +87,7 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
           children: [
             Expanded(
                 child: ListView.builder(
+              addAutomaticKeepAlives: true,
               itemCount: GameManager.enteredNumberList.length,
               itemBuilder: (BuildContext context, int index) {
                 return Row(
@@ -108,7 +107,7 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
                       EnteredNumberButton(
                           GameManager.enteredNumberList[index][i],
                           changeOnLongPressedSelectedEnteredNumber),
-                    Text(GameManager.enteredNumberList[index][4]),
+                    Text(GameManager.checkResult(index)),
                     const SizedBox(width: 50),
                     const Padding(padding: EdgeInsets.only(bottom: 65))
                   ],
@@ -123,9 +122,7 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
                 IconButton(
                     onPressed: () {
                       setState(() {
-                        GameManager.generateClearDraftNumberList();
-                        GameManager.generateClearButtonActiveList();
-                        GameManager.onPressedSelectedDraftNumberButton = 0;
+                        GameManager.onDeleteButtonClick();
                       });
                     },
                     icon: const Icon(Icons.delete)),
@@ -134,24 +131,9 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
                       changeOnLongPressedSelectedDraftNumber),
                 IconButton(
                     onPressed: () {
-                      if (!GameManager.draftNumberList.contains('')) {
-                        setState(() {
-                          GameManager.enteredNumberList
-                              .add(GameManager.draftNumberList);
-                          GameManager.enteredNumberList.last.add(checkResult());
-                          GameManager.generateClearDraftNumberList();
-                          GameManager.generateClearButtonActiveList();
-                          for (int i = 0; i < 4; i++) {
-                            if (!GameManager
-                                    .onLongPressedSelectedDraftNumberButtonsList[
-                                i]) {
-                              GameManager.onPressedSelectedDraftNumberButton =
-                                  i;
-                              return;
-                            }
-                          }
-                        });
-                      }
+                      setState(() {
+                        GameManager.onCheckButtonClick();
+                      });
                     },
                     icon: const Icon(Icons.check)),
                 const SizedBox(width: 50),
@@ -169,24 +151,5 @@ class _SinglePlayerGameScreenState extends State<SinglePlayerGameScreen> {
             const SizedBox(height: 50),
           ],
         ));
-  }
-
-  // Можно оптимизировать
-  String checkResult() {
-    int cows = 0;
-    int bulls = 0;
-
-    for (int i = 0; i < 4; i++) {
-      for (int j = 0; j < 4; j++) {
-        if (GameManager.draftNumberList[i] ==
-            GameManager.hiddenNumberSet.elementAt(j)) {
-          i == j ? bulls++ : cows++;
-          break;
-        }
-      }
-    }
-
-    String result = '$cows cows \n $bulls bulls';
-    return bulls == 4 ? 'You win!' : result;
   }
 }

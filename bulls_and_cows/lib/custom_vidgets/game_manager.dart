@@ -1,7 +1,7 @@
 import 'dart:math';
 
 class GameManager {
-  static Set<String> hiddenNumberSet = {};
+  static final Set<String> _hiddenNumberSet = {};
 
   static List<List<String>> enteredNumberList = [];
   static List<String> draftNumberList = List.generate(4, ((index) => ''));
@@ -17,7 +17,7 @@ class GameManager {
 
   static String? onLongPressedSelectedEnteredNumber;
 
-  static void generateClearButtonActiveList() {
+  static void _generateClearButtonActiveList() {
     buttonActiveList = List.generate(
         9,
         ((index) => lastOnLongPressedSelectedDraftNumbersList
@@ -26,14 +26,14 @@ class GameManager {
             : true));
   }
 
-  static void generateClearHiddenNumber() {
-    hiddenNumberSet.clear();
+  static void _generateClearHiddenNumber() {
+    _hiddenNumberSet.clear();
     do {
-      hiddenNumberSet.add((Random().nextInt(9) + 1).toString());
-    } while (hiddenNumberSet.length != 4);
+      _hiddenNumberSet.add((Random().nextInt(9) + 1).toString());
+    } while (_hiddenNumberSet.length != 4);
   }
 
-  static void generateClearDraftNumberList() {
+  static void _generateClearDraftNumberList() {
     draftNumberList = List.generate(
         4,
         ((index) => onLongPressedSelectedDraftNumberButtonsList[index]
@@ -50,13 +50,13 @@ class GameManager {
     lastOnPressedSelectedDraftNumber = null;
     onLongPressedSelectedEnteredNumber = null;
 
-    generateClearDraftNumberList();
-    generateClearHiddenNumber();
-    generateClearButtonActiveList();
+    _generateClearDraftNumberList();
+    _generateClearHiddenNumber();
+    _generateClearButtonActiveList();
   }
 
   static void clearAllInstance() {
-    hiddenNumberSet.clear();
+    _hiddenNumberSet.clear();
     enteredNumberList.clear();
     draftNumberList.clear();
     buttonActiveList.clear();
@@ -65,5 +65,47 @@ class GameManager {
     lastOnLongPressedSelectedDraftNumbersList.cast();
     lastOnPressedSelectedDraftNumber = null;
     onLongPressedSelectedEnteredNumber = null;
+  }
+
+  static void onDeleteButtonClick() {
+    _generateClearDraftNumberList();
+    _generateClearButtonActiveList();
+    for (int i = 0; i < 4; i++) {
+      if (!GameManager.onLongPressedSelectedDraftNumberButtonsList[i]) {
+        GameManager.onPressedSelectedDraftNumberButton = i;
+        return;
+      }
+    }
+  }
+
+  static void onCheckButtonClick() {
+    if (!draftNumberList.contains('')) {
+      enteredNumberList.add(draftNumberList);
+      _generateClearDraftNumberList();
+      _generateClearButtonActiveList();
+      for (int i = 0; i < 4; i++) {
+        if (!onLongPressedSelectedDraftNumberButtonsList[i]) {
+          onPressedSelectedDraftNumberButton = i;
+          return;
+        }
+      }
+    }
+  }
+
+  static String checkResult(int index) {
+    int cows = 0;
+    int bulls = 0;
+
+    for (int i = 0; i < 4; i++) {
+      for (int j = 0; j < 4; j++) {
+        if (enteredNumberList[index][i] == _hiddenNumberSet.elementAt(j)) {
+          i == j ? bulls++ : cows++;
+          break;
+        }
+      }
+    }
+
+    String result = '$cows cows \n $bulls bulls';
+    return bulls == 4 ? 'You win!' : result;
   }
 }
